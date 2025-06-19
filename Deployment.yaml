@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: airflow-api-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: airflow-api-backend
+  template:
+    metadata:
+      labels:
+        app: airflow-api-backend
+    spec:
+      containers:
+        - name: backend
+          image: your-backend-image
+          ports:
+            - containerPort: 3000
+          env:
+            - name: AIRFLOW_API_URL
+              value: "http://airflow-webserver.default.svc.cluster.local:8080/api/v1"
+            - name: AIRFLOW_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: airflow-secret
+                  key: AIRFLOW_USERNAME
+            - name: AIRFLOW_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: airflow-secret
+                  key: AIRFLOW_PASSWORD
+
