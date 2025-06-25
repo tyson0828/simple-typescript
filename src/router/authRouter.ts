@@ -1,30 +1,19 @@
-// src/router/authRouter.ts
+// File: src/router/authRouter.ts
 import express from "express";
-import passport from "passport";
+import { azureAuthenticate } from "../auth/auth";
 
 const router = express.Router();
 
-// Redirect to Azure login
-router.get("/login", passport.authenticate("azuread-openidconnect", {
-  failureRedirect: "/login-failure"
-}));
+router.get("/login", azureAuthenticate);
 
-// Azure callback
-router.get("/auth/openid/return",
-  passport.authenticate("azuread-openidconnect", {
-    failureRedirect: "/login-failure"
-  }),
-  (req, res) => {
-    res.redirect("/"); // Redirect after login
-  }
-);
+router.get("/auth/openid/return", azureAuthenticate, (req, res) => {
+  res.redirect("/"); // Redirect after login success
+});
 
-// Login failure
 router.get("/login-failure", (req, res) => {
   res.status(401).send("Login Failed");
 });
 
-// Logout
 router.get("/logout", (req, res) => {
   req.logout(() => {
     res.redirect("/");
