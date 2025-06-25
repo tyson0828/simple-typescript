@@ -1,0 +1,12 @@
+mount -t cifs //192.168.1.100/shared /mnt/shared -o username=user,password=pass
+
+
+GET /files?path=relative/path: Browse files/folders in the shared mount
+
+POST /upload: Upload a file to the shared drive (uses multipart form-data)
+
+GET /download?path=relative/file.txt: Download a file from the shared drive
+
+DELETE /file: Delete a file from the shared drive
+
+
