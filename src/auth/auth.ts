@@ -6,9 +6,43 @@ import { RequestHandler, Request, Response, NextFunction } from "express";
 
 // Required: Serialize and deserialize user for session support
 passport.serializeUser((user, done) => done(null, user));
-passport.deserializeUser((obj, done) => done(null, obj));
+//passport.deserializeUser((obj, done) => done(null, obj));
+
+interface User {
+  id?: string;
+  displayName?: string;
+  [key: string]: any;
+}
+passport.deserializeUser((obj: User, done) => done(null, obj));
+
+//passport.deserializeUser((obj: any, done) => done(null, obj));
 
 // Azure AD Strategy configuration
+passport.use(new OIDCStrategy(
+  {
+    identityMetadata: `https://login.microsoftonline.com/${process.env.AZURE_TENANT_ID}/v2.0/.well-known/openid-configuration`,
+    clientID: process.env.AZURE_CLIENT_ID!,
+    clientSecret: process.env.AZURE_CLIENT_SECRET!,
+    responseType: "code",
+    responseMode: "query",
+    redirectUrl: process.env.AZURE_REDIRECT_URI!,
+    allowHttpForRedirectUrl: true,
+    scope: ["profile", "email"],
+    passReqToCallback: false  // Add this line to resolve the TS error
+  },
+  (
+    iss: string,
+    sub: string,
+    profile: any,
+    accessToken: string,
+    refreshToken: string,
+    done: Function
+  ) => {
+    return done(null, profile);
+  }
+));
+
+/*
 passport.use(new OIDCStrategy({
     identityMetadata: `https://login.microsoftonline.com/${process.env.AZURE_TENANT_ID}/v2.0/.well-known/openid-configuration`,
     clientID: process.env.AZURE_CLIENT_ID!,
@@ -24,6 +58,7 @@ passport.use(new OIDCStrategy({
     return done(null, profile);
   }
 ));
+*/
 
 // Export middleware for authentication
 export const azureAuthenticate: RequestHandler = passport.authenticate("azuread-openidconnect", {

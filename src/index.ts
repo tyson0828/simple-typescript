@@ -1,11 +1,16 @@
 // index.ts
 import express from "express";
 import session from "express-session";
-import passport from "passport";
+
 import dotenv from "dotenv";
+dotenv.config();
+
+console.log("AZURE_CLIENT_ID:", process.env.AZURE_CLIENT_ID);
+
+import passport from "passport";
 import apiRouter from "./router";
 
-dotenv.config();
+
 
 const app = express();
 
